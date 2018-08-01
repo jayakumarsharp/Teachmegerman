@@ -1,0 +1,38 @@
+
+<p>Welcome to  Learning GERMAN LANGUAGE:</p>
+
+<p>To help you get started, we've also set up:</p>
+<div>
+    <textarea rows="3" cols="40" [(ngModel)]="Germanoutput" placeholder="German"></textarea>
+    <textarea rows="3" cols="40" [(ngModel)]="Tamiloutput" placeholder="Tamil"></textarea>
+    <textarea rows="3" cols="40" [(ngModel)]="Englishinput" placeholder="English"></textarea>
+    <textarea rows="3" cols="40" [(ngModel)]="Description" placeholder="Description"></textarea>
+    <button (click)="save()">Save</button>
+
+   
+
+<p *ngIf="!forecasts"><em>Loading...</em></p>
+<table class='table' *ngIf="forecasts">
+    <thead>
+        <tr>
+
+            <th>German </th>
+            <th>Tamil (F)</th>
+            <th>English</th>
+            <th>Description</th>
+            <th>UpdatedOn</th>
+
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let forecast of forecasts">
+
+            <td>{{ forecast.german }}</td>
+            <td>{{ forecast.tamil }}</td>
+            <td>{{ forecast.english }}</td>
+            <td>{{ forecast.description }}</td>
+            <td>{{ forecast.UpdatedOn }}</td>
+        </tr>
+    </tbody>
+</table>
+</div>

@@ -1,9 +1,7 @@
 // set up ======================================================================
 var express = require('express');
 var app = express(); // create our app w/ express
-var mongoose = require('mongoose'); // mongoose for mongodb
 var port = process.env.PORT || 8080; // set the port
-var database = require('./config/database'); // load the database config
 var morgan = require('morgan');
 var bodyParser = require('body-parser');
 var methodOverride = require('method-override');
@@ -12,6 +10,8 @@ var methodOverride = require('method-override');
 //mongoose.connect(database.localUrl); 	// Connect to local MongoDB instance. A remoteUrl is also available (modulus.io)
 
 app.use(express.static('./public')); // set the static files location /public/img will be /img for users
+
+//app.use(express.static('./Ang/dist/Ang'));
 app.use(morgan('dev')); // log every request to the console
 app.use(bodyParser.urlencoded({
     'extended': 'true'
@@ -22,80 +22,66 @@ app.use(bodyParser.json({
 })); // parse application/vnd.api+json as json
 app.use(methodOverride('X-HTTP-Method-Override')); // override with the X-HTTP-Method-Override header in the request
 
-
+app.use('/node_modules', express.static(__dirname + '/node_modules'));
 
 const MongoClient = require('mongodb').MongoClient;
 const assert = require('assert');
 
 // Connection URL
-const url = 'mongodb+srv://adminuser:123@cluster0-d53ex.mongodb.net/test';
-
+const url = 'mongodb+srv://adminuser:123@cluster0-d53ex.mongodb.net';
 // Database Name
-const dbName = 'myCollection';
-
-
-
-
+const dbName = 'name';
 
 // Use connect method to connect to the server
 MongoClient.connect(url, function (err, client) {
     assert.equal(null, err);
     console.log("Connected successfully to server");
     const db = client.db(dbName);
-    //client.close();
 
     function getTodos(res) {
         db.collection('name').find().toArray((err, todos) => {
-
+            console.log("get to server");
             // if there is an error retrieving, send the error. nothing after res.send(err) will execute
             if (err) {
                 res.send(err);
             }
-
             res.json(todos); // return all todos in JSON format
         });
     }
-
     app.get('/api/todos', function (req, res) {
-
         getTodos(res);
     });
 
-    // create todo and send back all todos after creation
     app.post('/api/todos', function (req, res) {
-
+        console.log(req.body);
         db.collection("name").save({
-            name: req.body.text
+            'german': req.body.Germanoutput,
+            'tamil': req.body.Tamiloutput,
+            'english': req.body.Englishinput,
+            'description': req.body.Description,
+            'UpdatedOn': new Date()
         }, (err, result) => {
             if (err) {
                 console.log(err);
             }
-
         }, function (err, todo) {
             if (err)
                 res.send(err);
-
-            // get and return all the todos after you create another
             getTodos(res);
         });
-
     });
 
-    // delete a todo
     app.delete('/api/todos/:todo_id', function (req, res) {
-        Todo.remove({
-            _id: req.params.todo_id
-        }, function (err, todo) {
-            if (err)
-                res.send(err);
+        db.collection("name").drop(function (err, delOK) {
+            if (err) throw err;
+            if (delOK) console.log("Collection deleted");
 
-            getTodos(res);
         });
     });
 
     // application -------------------------------------------------------------
     app.get('*', function (req, res) {
-        res.sendFile(__dirname + '/public/index.html'); // load the single view file (angular will handle the page changes on the front-end)
+        res.sendFile(__dirname + '/Public/index.html'); // load the single view file (angular will handle the page changes on the front-end)
     });
 
 
