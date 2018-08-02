@@ -26,34 +26,29 @@ app.use('/node_modules', express.static(__dirname + '/node_modules'));
 
 const MongoClient = require('mongodb').MongoClient;
 const assert = require('assert');
-
-// Connection URL
 const url = 'mongodb+srv://adminuser:123@cluster0-d53ex.mongodb.net';
-// Database Name
 const dbName = 'name';
 
-// Use connect method to connect to the server
 MongoClient.connect(url, function (err, client) {
     assert.equal(null, err);
     console.log("Connected successfully to server");
     const db = client.db(dbName);
 
     function getTodos(res) {
+        console.log("get request");
         db.collection('name').find().toArray((err, todos) => {
             console.log("get to server");
-            // if there is an error retrieving, send the error. nothing after res.send(err) will execute
             if (err) {
                 res.send(err);
             }
-            res.json(todos); // return all todos in JSON format
+            res.json(todos);
         });
     }
     app.get('/api/todos', function (req, res) {
         getTodos(res);
     });
-
     app.post('/api/todos', function (req, res) {
-        console.log(req.body);
+        console.log("post request");
         db.collection("name").save({
             'german': req.body.Germanoutput,
             'tamil': req.body.Tamiloutput,
@@ -67,10 +62,10 @@ MongoClient.connect(url, function (err, client) {
         }, function (err, todo) {
             if (err)
                 res.send(err);
-            getTodos(res);
+            console.log('response after insertion')
         });
+        getTodos(res);
     });
-
     app.delete('/api/todos/:todo_id', function (req, res) {
         db.collection("name").drop(function (err, delOK) {
             if (err) throw err;
@@ -79,18 +74,13 @@ MongoClient.connect(url, function (err, client) {
         });
     });
 
-    // application -------------------------------------------------------------
     app.get('*', function (req, res) {
         res.sendFile(__dirname + '/Public/index.html'); // load the single view file (angular will handle the page changes on the front-end)
     });
-
-
 });
 
 // routes ======================================================================
 //require('./app/routes.js')(app);
-
-
 
 // listen (start app with node server.js) ======================================
 app.listen(port);

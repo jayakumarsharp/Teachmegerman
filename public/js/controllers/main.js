@@ -5,6 +5,7 @@ angular.module('todoController', ["agGrid"])
 	.controller('mainController', ['$scope', '$http', 'Todos', function ($scope, $http, Todos) {
 		$scope.formData = {};
 		$scope.loading = true;
+		$scope.todos = [];
 		var columnDefs = [{
 				headerName: "German",
 				field: "german"
@@ -27,10 +28,20 @@ angular.module('todoController', ["agGrid"])
 			}
 		];
 
-		
+
 		$scope.gridOptions = {
 			columnDefs: columnDefs,
-			rowData: []
+			rowData: $scope.todos,
+			enableFilter: true,
+			onGridReady: function (params) {
+				params.api.sizeColumnsToFit();
+
+				window.addEventListener('resize', function () {
+					setTimeout(function () {
+						params.api.sizeColumnsToFit();
+					})
+				})
+			}
 		};
 		// GET =====================================================================
 		// when landing on the page, get all todos and show them
